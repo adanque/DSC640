@@ -57,7 +57,7 @@ plt.xticks(rotation=90)
 plt.xlabel("Issue", size=15)
 plt.ylabel("Approval Ratings", size=15)
 plt.title("Obama Approval Rating by Issue", size=18)
-plt.savefig(".\\plots\\Obama Approval Rating by Issue Bar Chart.png")
+plt.savefig(".\\plots\\Obama Approval Rating by Issue Bar Chart Python.png")
 plt.show()
 
 
@@ -71,28 +71,33 @@ plt.xticks(rotation=90)
 plt.xlabel("Issue", size=15)
 plt.ylabel("Approval Ratings", size=15)
 plt.title("Obama Approval Rating by Issue", size=18)
-plt.savefig(".\\plots\\Obama Approval Rating by Issue Stacked Bar Chart.png")
+plt.savefig(".\\plots\\Obama Approval Rating by Issue Stacked Bar Chart Python.png")
 plt.show()
 
 
 ######### Pie Chart
 labels = oadf_sorted['Issue']
 explode = oadf_sorted[['Approve']]
-fig = plt.figure(figsize=(10, 7))
-plt.pie(explode, autopct = lambda pct: func(pct, explode), labels=labels)
-plt.title("Obama Approval Rating by Issue", size=18)
-plt.savefig(".\\plots\\Obama Approval Rating by Issue Stacked Pie Chart.png")
-plt.show()
+print(explode)
 
+issueslist = ["Economy"]
+outval = oadf_sorted[['Issue','Approve','Disapprove','None']]
+outval2 = outval[outval.Issue.isin(issueslist)]
+outval4 = outval2.melt(id_vars=['Issue'], value_vars=['Approve','Disapprove','None'])
+plt.pie(outval4['value'], autopct='%1.1f%%', labels= outval4['variable'])
+plt.title("Obama Approval Ratings on Economic Issues", size=18)
+plt.savefig(".\\plots\\Obama Approval Rating by Issue Stacked Pie Chart Python.png")
+plt.show()
 
 ######### Donut Chart
 labels = oadf_sorted['Issue']
 explode = oadf_sorted[['Approve']]
 fig = plt.figure(figsize=(10, 7))
-plt.pie(explode, autopct = lambda pct: func(pct, explode), labels=labels)
-plt.title("Obama Approval Rating by Issue", size=18)
+#plt.pie(explode, autopct = lambda pct: func(pct, explode), labels=labels)
+plt.pie(outval4['value'], autopct='%1.1f%%', labels= outval4['variable'])
+plt.title("Obama Approval Ratings on Economic Issues", size=18)
 my_circle=plt.Circle( (0,0), 0.7, color='white')
 p=plt.gcf()
 p.gca().add_artist(my_circle)
-plt.savefig(".\\plots\\Obama Approval Rating by Issue Stacked Donut Chart.png")
+plt.savefig(".\\plots\\Obama Approval Rating by Issue Stacked Donut Chart Python.png")
 plt.show()
