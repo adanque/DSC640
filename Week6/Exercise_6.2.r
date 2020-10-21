@@ -1,8 +1,8 @@
 #Author: Alan Danque
 #Date:   20201003
 #Class:  DSC 640
-#Exercise 5.2
-#R Heat maps, Spatial charts and Contour chart
+#Exercise 6.2
+#R histograms, box plots, bullet charts, and an additional charts of your choice
 
 #install.packages("rpivotTable")
 #install.packages("readxl")
@@ -26,72 +26,83 @@ lapply(packages, library, character.only = TRUE)
 # In case you are unfamiliar with lapply() - it has been used to apply the install.packages() and library() functions over a list of package names. More information here: https://www.r-bloggers.com/using-apply-sapply-lapply-in-r/
 
 # Read csv input
-nba <- read.csv("./datasets/ppg2008.csv")
-print(is.data.frame(nba))
-print(ncol(nba))
-print(nrow(nba))
 
-costcodata <- read.csv("./datasets/costcos-geocoded.csv")
-print(is.data.frame(costcodata))
-print(ncol(costcodata))
-print(nrow(costcodata))
+birthrate <- read.csv("./datasets/birth-rate.csv")
+print(is.data.frame(birthrate))
+print(ncol(birthrate))
+print(nrow(birthrate))
+
+crime <- read.csv("./datasets/crimeratesbystate-formatted.csv")
+print(is.data.frame(crime))
+print(ncol(crime))
+print(nrow(crime))
+
+education <- read.csv("./datasets/education.csv")
+print(is.data.frame(education))
+print(ncol(education))
+print(nrow(education))
+
+# Histograms
+hist(crime$motor_vehicle_theft,
+     main="Motor Vehicle Thefts Counts by Amount",
+     xlab="Motor Vehicle Thefts Amounts",
+     ylab="Counts",
+     col="darkmagenta",
+     freq=TRUE)
+dev.copy(png,"./plots/Histogram R.png")
+dev.off()
 
 
-# Heat maps
-nba$Name <- with(nba, reorder(Name, PTS))
-
+# Box plots
 library(ggplot2)
-library(plyr)
-library(dplyr)
-library(reshape2)
-library(scales)
-
-nba.m <- melt(nba)
-nba.m <- ddply(nba.m, .(variable), transform, rescale = rescale(value))
-base_size <- 9
-(p <- ggplot(nba.m, aes(variable, Name)) + geom_tile(aes(fill = rescale), colour = "white") + scale_fill_gradient(low = "white", high = "steelblue"))
-p + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) +
-        scale_y_discrete(expand = c(0, 0)) + 
-        theme(axis.text.x=element_text(angle=90, hjust=0, vjust= 0.1)) +
+options(warn=-1)
+crimedf <- subset(crime, select = -c(state))
+meltData <- melt(crimedf)
+p <- ggplot(meltData, aes(factor(variable), value)) 
+p + geom_boxplot() + facet_wrap(~variable, scale="free")+ 
+        theme(axis.text.x=element_text(angle=0, hjust=0, vjust= 0.1)) +
         theme(axis.text.y=element_text(hjust=0, vjust= 0.1)) +
-        ggtitle("2008 Basketball Player Statistics") +
+        ggtitle("US Crime Statistics") +
         xlab("Statistic") + 
-        ylab("Basketball Player")
-dev.copy(png,"./plots/Heatmap Plot R.png")
+        ylab("Instance Counts")
+dev.copy(png,"./plots/Box Plot R.png")
 dev.off()
 
 
+# Bullet charts
+eddf <- education[,c("state","math")]
+eddf <- eddf[!(eddf$state=='United States'),]
+eddf$mean <- 400
+eddf$target <- 800
 
-# Spatial charts
-library(leaflet)
-library(htmlwidgets)
-costcodata$faddr <- paste(costcodata$Address, costcodata$City, costcodata$State, costcodata$Zip.Code )
-print(costcodata$faddr)
-m <- leaflet()
-m <- addTiles(m)
-m <- addMarkers(m, lng=costcodata$Longitude, lat=costcodata$Latitude, popup=costcodata$faddr)
-m
-saveWidget(m, file="C://Users/aland/DSC640/Week5/plots/Spatial Map R.html")
-
-
-# Contour chart
-library(ggplot2)
-library(akima)
-library(dplyr)
-
-interpdf <-interp2xyz(interp(x=nba$FGA, y=nba$PTS, z=nba$FGP, duplicate="mean"), data.frame=TRUE)
-print(interpdf)
-interpdf %>%
-        filter(!is.na(z)) %>%
-        tbl_df() %>%
-        ggplot(aes(x = x, y = y, z = z, fill = z)) + 
-        geom_tile() + 
-        geom_contour(color = "white", alpha = 0.05) + 
-        scale_fill_distiller(palette="Blues", na.value="white") + 
-        theme_bw() +
-        xlab("PTS") +
-        ylab("FGA") +
-        ggtitle("Basketball FGP Based on FGA and PTS Contour Plot") +
-        guides(fill=guide_legend(title="FGP"))
-dev.copy(png,"./plots/Contour Plot R.png")
+p <- ggplot(eddf, aes(math, state) )
+p <- ggplot(eddf, aes(state, math) )
+p <- p + geom_col(fill="grey", width=0.5)
+p <- p + geom_col(aes(state, mean), width=0.2)
+p <- p + geom_point(aes(state, target), colour="red")
+p <- p + geom_errorbar(aes(y = target,x = state, ymin = target,ymax
+                           = target), width = .45)
+p <- p + coord_flip()+ 
+        theme(axis.text.x=element_text(angle=0, hjust=0, vjust= 0.1)) +
+        theme(axis.text.y=element_text(hjust=0, vjust= 0.1)) +
+        ggtitle("PSAT Math Scores By State") +
+        xlab("Math Scores") + 
+        ylab("States")
+dev.copy(png,"./plots/Bullet Chart R.png")
 dev.off()
+p
+
+# An additional charts of your choice
+
+
+
+
+
+
+
+
+
+
+
+
+
