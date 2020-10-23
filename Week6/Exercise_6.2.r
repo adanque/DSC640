@@ -16,7 +16,7 @@
 #library(treemap)
 
 # create list of packages we need 
-packages <- c("ggplot2", "dplyr", "gapminder", "readxl", "tidyverse", "reshape2", "data.table", "plotly", "treemap")
+packages <- c("wrapr", "ggplot2", "dplyr", "gapminder", "readxl", "tidyverse", "reshape2", "data.table", "plotly", "treemap")
 print(packages)
 # Install packages 
 lapply(packages, install.packages, character.only = TRUE)
@@ -93,13 +93,13 @@ dev.off()
 p
 
 # An additional charts of your choice
-
-
-
-
-
-
-
+#devtools::install_github("WinVector/WVPlots")
+library(wrapr)
+library(WVPlots)
+ScatterHist(crime, "murder", "forcible_rape", smoothmethod="lm", title="Analysis between Forcible Rape and Murder", estimate_sig = TRUE)
+dev.copy(png,"./plots/Additional Chart R.png")
+dev.off()
+p
 
 
 
